@@ -35,8 +35,8 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         
         //TODO: Set the tapGesture here:
-        
-        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tableViewTapped))
+        messageTableView.addGestureRecognizer(tapGesture)
 
         //TODO: Register your MessageCell.xib file here:
         messageTableView.register(UINib(nibName: "MessageCell", bundle: nil), forCellReuseIdentifier: "customMessageCell")
@@ -64,8 +64,9 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     //TODO: Declare tableViewTapped here:
-    
-    
+    @objc func tableViewTapped(){
+        messageTextfield.endEditing(true)
+    }
     
     //TODO: Declare configureTableView here:
     func configureTableView(){
@@ -73,30 +74,34 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
         messageTableView.estimatedRowHeight = 120.0
     }
     
-    
     ///////////////////////////////////////////
     
     //MARK:- TextField Delegate Methods
     
-    
-
-    
     //TODO: Declare textFieldDidBeginEditing here:
-    
-    
-    
+    //When the user begins editing.
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        UIView.animate(withDuration: 0.5) {
+            self.heightConstraint.constant = 308
+            //Call this method to rewrite the screen with the new height.
+            self.view.layoutIfNeeded()
+        }
+    }
     
     //TODO: Declare textFieldDidEndEditing here:
-    
+    //When the user ends editing.
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        UIView.animate(withDuration: 0.5) {
+            self.heightConstraint.constant = 50
+            //Call this method to rewrite the screen with the new height.
+            self.view.layoutIfNeeded()
+        }
+    }
 
-    
     ///////////////////////////////////////////
     
     
     //MARK: - Send & Recieve from Firebase
-    
-    
-    
     
     
     @IBAction func sendPressed(_ sender: AnyObject) {
@@ -108,9 +113,8 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     //TODO: Create the retrieveMessages method here:
-    
-    
 
+    
     
     
     
@@ -122,9 +126,6 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
         } catch {
             print("error: there war a problem loggin out")
         }
-        
     }
-    
-
 
 }
