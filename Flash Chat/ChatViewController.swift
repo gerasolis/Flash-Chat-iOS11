@@ -82,7 +82,7 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     //When the user begins editing.
     func textFieldDidBeginEditing(_ textField: UITextField) {
         UIView.animate(withDuration: 0.5) {
-            self.heightConstraint.constant = 308
+            self.heightConstraint.constant = 360
             //Call this method to rewrite the screen with the new height.
             self.view.layoutIfNeeded()
         }
@@ -105,11 +105,22 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     
     @IBAction func sendPressed(_ sender: AnyObject) {
-        
-        
+        messageTextfield.endEditing(true)
+        messageTextfield.isEnabled = false
+        sendButton.isEnabled = false
         //TODO: Send the message to Firebase and save it in our database
-        
-        
+        let messageDB = Database.database().reference().child("Messages")
+        let messageDictionary = ["Sender" : Auth.auth().currentUser?.email, "Message" : messageTextfield.text!]
+        messageDB.childByAutoId().setValue(messageDictionary) { (error, reference) in
+            if error != nil {
+                print(error!)
+            } else {
+                print("Message saved successfully.")
+                self.messageTextfield.isEnabled = true
+                self.sendButton.isEnabled = true
+                self.messageTextfield.text = ""
+            }
+        }
     }
     
     //TODO: Create the retrieveMessages method here:
