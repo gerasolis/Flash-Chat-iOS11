@@ -12,7 +12,7 @@ import Firebase
 class ChatViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
     
     // Declare instance variables here
-
+    var messageArray : [Message] = [Message]()
     
     // We've pre-linked the IBOutlets
     @IBOutlet var heightConstraint: NSLayoutConstraint!
@@ -41,6 +41,7 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
         //TODO: Register your MessageCell.xib file here:
         messageTableView.register(UINib(nibName: "MessageCell", bundle: nil), forCellReuseIdentifier: "customMessageCell")
         configureTableView()
+        retrieveMessages()
     }
 
     ///////////////////////////////////////////
@@ -52,15 +53,16 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         // Here, I want to display the Custom Message Cell Design on the TableView.
         let cell = tableView.dequeueReusableCell(withIdentifier: "customMessageCell", for: indexPath) as! CustomMessageCell
-        let messageArray = ["First message", "Second message", "Third message"]
-        cell.messageBody.text = messageArray[indexPath.row]
+        cell.messageBody.text = messageArray[indexPath.row].messageBody
+        cell.senderUsername.text = messageArray[indexPath.row].sender
+        cell.imageView?.image = UIImage(named: "egg")
         return cell
     }
     
     //TODO: Declare numberOfRowsInSection here:
     //Number of rows on the TableView.
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 3
+        return messageArray.count
     }
     
     //TODO: Declare tableViewTapped here:
@@ -124,7 +126,20 @@ class ChatViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     //TODO: Create the retrieveMessages method here:
-
+    func retrieveMessages(){
+        let messageDB = Database.database().reference().child("Messages")
+        //When this code find a new message in the database, the closure will be executed.
+        messageDB.observe(.childAdded) { (snapshot) in
+            //when a new message is added to the database.
+            let snapshotValue = snapshot.value as! Dictionary<String, String>
+            let messageObject = Message()
+            messageObject.messageBody = snapshotValue["Message"]!
+            messageObject.sender = snapshotValue["Sender"]!
+            self.messageArray.append(messageObject)
+            self.configureTableView()
+            self.messageTableView.reloadData()
+        }
+    }
     
     
     
